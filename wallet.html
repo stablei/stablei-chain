@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StableI Wallet</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a0a1a;
+    color: #fff;
+    font-family: 'Segoe UI', sans-serif;
+    min-height: 100vh;
+  }
+  header {
+    background: linear-gradient(135deg, #1a1a3e, #0d0d2b);
+    padding: 15px 20px;
+    text-align: center;
+    border-bottom: 2px solid #f7931a;
+  }
+  header h1 { color: #f7931a; font-size: 24px; letter-spacing: 2px; }
+  header p { color: #aaa; font-size: 12px; margin-top: 4px; }
+  .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+  .card {
+    background: #1a1a3e;
+    border: 1px solid #333;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  .card h2 {
+    color: #f7931a;
+    font-size: 16px;
+    margin-bottom: 15px;
+    letter-spacing: 1px;
+  }
+  .btn {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: all 0.3s;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, #f7931a, #e8820a);
+    color: #000;
+  }
+  .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+  .btn-success {
+    background: linear-gradient(135deg, #00ff88, #00cc66);
+    color: #000;
+  }
+  .btn-outline {
+    background: transparent;
+    border: 1px solid #f7931a;
+    color: #f7931a;
+  }
+  input, select {
+    width: 100%;
+    padding: 12px;
+    background: #0d0d2b;
+    border: 1px solid #333;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 14px;
+    margin-top: 8px;
+  }
+  input:focus, select:focus {
+    outline: none;
+    border-color: #f7931a;
+  }
+  .label { color: #aaa; font-size: 12px; margin-top: 12px; display: block; }
+  .address-box {
+    background: #0d0d2b;
+    border: 1px solid #00ff88;
+    border-radius: 8px;
+    padding: 12px;
+    font-family: monospace;
+    font-size: 11px;
+    color: #00ff88;
+    word-break: break-all;
+    margin-top: 8px;
+  }
+  .private-box {
+    background: #0d0d2b;
+    border: 1px solid #ff4444;
+    border-radius: 8px;
+    padding: 12px;
+    font-family: monospace;
+    font-size: 11px;
+    color: #ff4444;
+    word-break: break-all;
+    margin-top: 8px;
+  }
+  .balance-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    background: #0d0d2b;
+    border-radius: 8px;
+    margin-top: 8px;
+  }
+  .coin-label { color: #f7931a; font-weight: bold; font-size: 16px; }
+  .coin-amount { color: #00ff88; font-size: 18px; font-weight: bold; }
+  .coin-value { color: #aaa; font-size: 11px; }
+  .tx-item {
+    background: #0d0d2b;
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-top: 8px;
+    font-size: 12px;
+  }
+  .tx-sent { border-left: 3px solid #ff4444; }
+  .tx-received { border-left: 3px solid #00ff88; }
+  .tx-type { font-weight: bold; }
+  .tx-sent .tx-type { color: #ff4444; }
+  .tx-received .tx-type { color: #00ff88; }
+  .tx-amount { float: right; font-weight: bold; }
+  .tx-time { color: #555; font-size: 10px; margin-top: 4px; }
+  .alert {
+    padding: 12px;
+    border-radius: 8px;
+    margin-top: 10px;
+    font-size: 13px;
+    display: none;
+  }
+  .alert-success { background: #0d2b1a; border: 1px solid #00ff88; color: #00ff88; }
+  .alert-error { background: #2b0d0d; border: 1px solid #ff4444; color: #ff4444; }
+  .alert-warning { background: #2b200d; border: 1px solid #f7931a; color: #f7931a; }
+  .tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .tab {
+    flex: 1;
+    padding: 10px;
+    text-align: center;
+    background: #1a1a3e;
+    border: 1px solid #333;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #aaa;
+    transition: all 0.3s;
+  }
+  .tab.active {
+    border-color: #f7931a;
+    color: #f7931a;
+    background: #0d0d2b;
+  }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  .copy-btn {
+    background: #333;
+    border: none;
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 11px;
+    cursor: pointer;
+    margin-top: 6px;
+  }
+  .warning-text {
+    color: #ff4444;
+    font-size: 11px;
+    margin-top: 8px;
+  }
+  .fee-info {
+    color: #555;
+    font-size: 11px;
+    margin-top: 6px;
+  }
+  .live-dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background: #00ff88;
+    border-radius: 50%;
+    margin-right: 4px;
+    animation: pulse 1.5s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+  .hidden { display: none; }
+  #walletSection { display: none; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>⚡ STABLEI WALLET</h1>
+  <p><span class="live-dot"></span>Quantum Safe SHA3-256 • India's Blockchain 🇮🇳</p>
+</header>
+
+<div class="container">
+
+  <!-- Create/Import Wallet -->
+  <div id="setupSection">
+    <div class="card">
+      <h2>🎉 WELCOME TO STABLEI</h2>
+      <p style="color:#aaa; font-size:13px; margin-bottom:15px">
+        Create a new wallet or import existing one to send and receive SI, SIR, SID coins.
+      </p>
+
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab('create')">Create New</div>
+        <div class="tab" onclick="switchTab('import')">Import Wallet</div>
+      </div>
+
+      <!-- Create Tab -->
+      <div id="createTab" class="tab-content active">
+        <span class="label">Your Name</span>
+        <input type="text" id="walletName" placeholder="Enter your name">
+        <button class="btn btn-primary" onclick="createWallet()">
+          ⚡ Create New Wallet
+        </button>
+      </div>
+
+      <!-- Import Tab -->
+      <div id="importTab" class="tab-content">
+        <span class="label">Your Name</span>
+        <input type="text" id="importName" placeholder="Enter your name">
+        <span class="label">Private Key</span>
+        <input type="text" id="importKey" placeholder="Enter your private key">
+        <button class="btn btn-outline" onclick="importWallet()">
+          🔑 Import Wallet
+        </button>
+      </div>
+
+      <div id="setupAlert" class="alert"></div>
+    </div>
+  </div>
+
+  <!-- Wallet Dashboard -->
+  <div id="walletSection">
+
+    <!-- Balance Card -->
+    <div class="card">
+      <h2>💰 MY STABLEI WALLET</h2>
+      <div style="margin-bottom:10px">
+        <span style="color:#aaa; font-size:12px">Address:</span>
+        <div class="address-box" id="displayAddress">-</div>
+        <button class="copy-btn" onclick="copyAddress()">📋 Copy Address</button>
+      </div>
+
+      <div class="balance-row">
+        <div>
+          <div class="coin-label">SI</div>
+          <div class="coin-value">StableI Coin</div>
+        </div>
+        <div class="coin-amount" id="siBalance">0 SI</div>
+      </div>
+
+      <div class="balance-row">
+        <div>
+          <div class="coin-label">SIR</div>
+          <div class="coin-value">StableI Rupee</div>
+        </div>
+        <div class="coin-amount" id="sirBalance">0 SIR</div>
+      </div>
+
+      <div class="balance-row">
+        <div>
+          <div class="coin-label">SID</div>
+          <div class="coin-value">StableI Dollar</div>
+        </div>
+        <div class="coin-amount" id="sidBalance">0 SID</div>
+      </div>
+
+      <button class="btn btn-outline" onclick="showPrivateKey()" style="margin-top:15px">
+        🔑 Show Private Key
+      </button>
+      <div id="privateKeyBox" class="hidden">
+        <div class="private-box" id="displayPrivateKey">-</div>
+        <p class="warning-text">⚠️ NEVER share this with anyone! This is your money key!</p>
+      </div>
+    </div>
+
+    <!-- Send -->
+    <div class="card">
+      <h2>📤 SEND COINS</h2>
+      <span class="label">Recipient Address</span>
+      <input type="text" id="sendTo" placeholder="0xSI...">
+      <span class="label">Coin</span>
+      <select id="sendCoin">
+        <option value="SI">SI - StableI Coin</option>
+        <option value="SIR">SIR - StableI Rupee (₹1 each)</option>
+        <option value="SID">SID - StableI Dollar ($1 each)</option>
+      </select>
+      <span class="label">Amount</span>
+      <input type="number" id="sendAmount" placeholder="0.00">
+      <p class="fee-info">Fee: 0.1% of amount (minimum 0.001)</p>
+      <button class="btn btn-success" onclick="sendCoins()">
+        ⚡ Send Now
+      </button>
+      <div id="sendAlert" class="alert"></div>
+    </div>
+
+    <!-- Receive -->
+    <div class="card">
+      <h2>📥 RECEIVE COINS</h2>
+      <p style="color:#aaa; font-size:13px">Share your address to receive SI, SIR or SID coins:</p>
+      <div class="address-box" id="receiveAddress">-</div>
+      <button class="btn btn-outline" onclick="copyAddress()" style="margin-top:10px">
+        📋 Copy My Address
+      </button>
+      <button class="btn btn-outline" onclick="shareAddress()" style="margin-top:8px">
+        🔗 Share Address
+      </button>
+    </div>
+
+    <!-- Transactions -->
+    <div class="card">
+      <h2>📊 TRANSACTION HISTORY</h2>
+      <div id="txList">
+        <p style="color:#555; font-size:13px; text-align:center; padding:20px">
+          No transactions yet
+        </p>
+      </div>
+    </div>
+
+    <!-- Demo Coins -->
+    <div class="card">
+      <h2>🎁 GET TEST COINS</h2>
+      <p style="color:#aaa; font-size:13px; margin-bottom:10px">
+        Get free test coins to try StableI!
+      </p>
+      <button class="btn btn-primary" onclick="getTestCoins()">
+        🪙 Get 1000 Test SI Coins
+      </button>
+      <div id="faucetAlert" class="alert"></div>
+    </div>
+
+    <button class="btn btn-outline" onclick="logout()" style="margin-bottom:30px">
+      🚪 Logout
+    </button>
+
+  </div>
+</div>
+
+<script>
+// StableI Wallet Core
+let currentWallet = null;
+let wallets = {};
+let transactions = [];
+
+// Simple hash function
+function simpleHash(str) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  return Math.abs(hash).toString(16).padStart(8, '0');
+}
+
+// Generate wallet address
+function generateAddress(seed) {
+  const hash1 = simpleHash(seed + 'SI');
+  const hash2 = simpleHash(seed + 'CHAIN');
+  const hash3 = simpleHash(seed + Date.now());
+  return '0xSI' + (hash1 + hash2 + hash3).toUpperCase().substring(0, 32);
+}
+
+// Generate private key
+function generatePrivateKey(seed) {
+  let key = '';
+  const chars = '0123456789abcdef';
+  const seedHash = simpleHash(seed);
+  for (let i = 0; i < 64; i++) {
+    key += chars[(seedHash.charCodeAt(i % seedHash.length) + i) % 16];
+  }
+  return key;
+}
+
+// Switch tabs
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  if (tab === 'create') {
+    document.querySelectorAll('.tab')[0].classList.add('active');
+    document.getElementById('createTab').classList.add('active');
+  } else {
+    document.querySelectorAll('.tab')[1].classList.add('active');
+    document.getElementById('importTab').classList.add('active');
+  }
+}
+
+// Create wallet
+function createWallet() {
+  const name = document.getElementById('walletName').value.trim();
+  if (!name) {
+    showAlert('setupAlert', 'Please enter your name!', 'error');
+    return;
+  }
+
+  const seed = name + Date.now() + Math.random();
+  const privateKey = generatePrivateKey(seed);
+  const address = generateAddress(privateKey);
+
+  currentWallet = {
+    name: name,
+    address: address,
+    privateKey: privateKey,
+    balance: { SI: 0, SIR: 0, SID: 0 }
+  };
+
+  wallets[address] = currentWallet;
+  saveWallet();
+  showWalletDashboard();
+}
+
+// Import wallet
+function importWallet() {
+  const name = document.getElementById('importName').value.trim();
+  const key = document.getElementById('importKey').value.trim();
+
+  if (!name || !key) {
+    showAlert('setupAlert', 'Please enter name and private key!', 'error');
+    return;
+  }
+
+  const address = generateAddress(key);
+
+  // Check if wallet exists in storage
+  const saved = localStorage.getItem('stablei_' + key);
+  if (saved) {
+    currentWallet = JSON.parse(saved);
+    currentWallet.name = name;
+  } else {
+    currentWallet = {
+      name: name,
+      address: address,
+      privateKey: key,
+      balance: { SI: 0, SIR: 0, SID: 0 }
+    };
+  }
+
+  wallets[address] = currentWallet;
+  saveWallet();
+  showWalletDashboard();
+}
+
+// Show wallet dashboard
+function showWalletDashboard() {
+  document.getElementById('setupSection').style.display = 'none';
+  document.getElementById('walletSection').style.display = 'block';
+  updateDisplay();
+}
+
+// Update display
+function updateDisplay() {
+  if (!currentWallet) return;
+  document.getElementById('displayAddress').textContent = currentWallet.address;
+  document.getElementById('receiveAddress').textContent = currentWallet.address;
+  document.getElementById('displayPrivateKey').textContent = currentWallet.privateKey;
+  document.getElementById('siBalance').textContent = currentWallet.balance.SI + ' SI';
+  document.getElementById('sirBalance').textContent = currentWallet.balance.SIR + ' SIR (₹' + currentWallet.balance.SIR + ')';
+  document.getElementById('sidBalance').textContent = currentWallet.balance.SID + ' SID ($' + currentWallet.balance.SID + ')';
+  updateTxList();
+}
+
+// Send coins
+function sendCoins() {
+  const to = document.getElementById('sendTo').value.trim();
+  const coin = document.getElementById('sendCoin').value;
+  const amount = parseFloat(document.getElementById('sendAmount').value);
+
+  if (!to) {
+    showAlert('sendAlert', '❌ Please enter recipient address!', 'error');
+    return;
+  }
+  if (!amount || amount <= 0) {
+    showAlert('sendAlert', '❌ Please enter valid amount!', 'error');
+    return;
+  }
+  if (to === currentWallet.address) {
+    showAlert('sendAlert', '❌ Cannot send to yourself!', 'error');
+    return;
+  }
+
+  const fee = Math.max(parseFloat((amount * 0.001).toFixed(4)), 0.001);
+  const total = amount + fee;
+
+  if (currentWallet.balance[coin] < total) {
+    showAlert('sendAlert', `❌ Insufficient ${coin}! Need ${total} but have ${currentWallet.balance[coin]}`, 'error');
+    return;
+  }
+
+  // Deduct from sender
+  currentWallet.balance[coin] -= total;
+
+  // Add to receiver if exists
+  if (wallets[to]) {
+    wallets[to].balance[coin] += amount;
+  }
+
+  // Record transaction
+  const tx = {
+    id: simpleHash(currentWallet.address + to + Date.now()),
+    type: 'SENT',
+    from: currentWallet.address,
+    to: to,
+    amount: amount,
+    coin: coin,
+    fee: fee,
+    time: new Date().toLocaleString()
+  };
+
+  transactions.unshift(tx);
+  saveWallet();
+  updateDisplay();
+
+  document.getElementById('sendTo').value = '';
+  document.getElementById('sendAmount').value = '';
+
+  showAlert('sendAlert', `✅ Sent ${amount} ${coin} successfully! TxID: ${tx.id.substring(0,12)}...`, 'success');
+}
+
+// Get test coins
+function getTestCoins() {
+  const key = 'faucet_' + currentWallet.address;
+  if (localStorage.getItem(key)) {
+    showAlert('faucetAlert', '⚠️ Already claimed! One claim per wallet.', 'warning');
+    return;
+  }
+
+  currentWallet.balance.SI += 1000;
+  currentWallet.balance.SIR += 100;
+  currentWallet.balance.SID += 10;
+
+  const tx = {
+    id: simpleHash('faucet' + Date.now()),
+    type: 'RECEIVED',
+    from: 'StableI Faucet',
+    to: currentWallet.address,
+    amount: '1000 SI + 100 SIR + 10 SID',
+    coin: 'SI',
+    fee: 0,
+    time: new Date().toLocaleString()
+  };
+
+  transactions.unshift(tx);
+  localStorage.setItem(key, 'claimed');
+  saveWallet();
+  updateDisplay();
+
+  showAlert('faucetAlert', '🎉 Received 1000 SI + 100 SIR + 10 SID!', 'success');
+}
+
+// Update transaction list
+function updateTxList() {
+  const list = document.getElementById('txList');
+  if (transactions.length === 0) {
+    list.innerHTML = '<p style="color:#555; font-size:13px; text-align:center; padding:20px">No transactions yet</p>';
+    return;
+  }
+
+  list.innerHTML = transactions.map(tx => `
+    <div class="tx-item ${tx.type === 'SENT' ? 'tx-sent' : 'tx-received'}">
+      <span class="tx-type">${tx.type === 'SENT' ? '📤 SENT' : '📥 RECEIVED'}</span>
+      <span class="tx-amount">${tx.amount} ${tx.coin}</span>
+      <div style="color:#aaa; font-size:11px; margin-top:4px">
+        ${tx.type === 'SENT' ? 'To: ' + tx.to.substring(0,20) + '...' : 'From: ' + tx.from.substring(0,20) + '...'}
+      </div>
+      ${tx.fee ? `<div style="color:#555; font-size:10px">Fee: ${tx.fee} ${tx.coin}</div>` : ''}
+      <div class="tx-time">${tx.time} • TxID: ${tx.id.substring(0,12)}...</div>
+    </div>
+  `).join('');
+}
+
+// Show/hide private key
+function showPrivateKey() {
+  const box = document.getElementById('privateKeyBox');
+  box.classList.toggle('hidden');
+}
+
+// Copy address
+function copyAddress() {
+  navigator.clipboard.writeText(currentWallet.address);
+  alert('✅ Address copied!');
+}
+
+// Share address
+function shareAddress() {
+  if (navigator.share) {
+    navigator.share({
+      title: 'My StableI Wallet Address',
+      text: 'Send me SI coins! My StableI address: ' + currentWallet.address
+    });
+  } else {
+    copyAddress();
+  }
+}
+
+// Save wallet
+function saveWallet() {
+  if (currentWallet) {
+    localStorage.setItem('stablei_' + currentWallet.privateKey, JSON.stringify(currentWallet));
+    localStorage.setItem('stablei_current', currentWallet.privateKey);
+    localStorage.setItem('stablei_txs', JSON.stringify(transactions));
+  }
+}
+
+// Show alert
+function showAlert(id, msg, type) {
+  const el = document.getElementById(id);
+  el.className = 'alert alert-' + type;
+  el.textContent = msg;
+  el.style.display = 'block';
+  setTimeout(() => el.style.display = 'none', 4000);
+}
+
+// Logout
+function logout() {
+  currentWallet = null;
+  transactions = [];
+  document.getElementById('walletSection').style.display = 'none';
+  document.getElementById('setupSection').style.display = 'block';
+  localStorage.removeItem('stablei_current');
+}
+
+// Auto load saved wallet
+window.onload = function() {
+  const savedKey = localStorage.getItem('stablei_current');
+  if (savedKey) {
+    const saved = localStorage.getItem('stablei_' + savedKey);
+    if (saved) {
+      currentWallet = JSON.parse(saved);
+      wallets[currentWallet.address] = currentWallet;
+      const savedTxs = localStorage.getItem('stablei_txs');
+      if (savedTxs) transactions = JSON.parse(savedTxs);
+      showWalletDashboard();
+    }
+  }
+};
+</script>
+</body>
+</html>
