@@ -130,11 +130,7 @@
   .alert-success { background: #0d2b1a; border: 1px solid #00ff88; color: #00ff88; }
   .alert-error { background: #2b0d0d; border: 1px solid #ff4444; color: #ff4444; }
   .alert-warning { background: #2b200d; border: 1px solid #f7931a; color: #f7931a; }
-  .tabs {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 20px;
-  }
+  .tabs { display: flex; gap: 8px; margin-bottom: 20px; }
   .tab {
     flex: 1;
     padding: 10px;
@@ -147,11 +143,7 @@
     color: #aaa;
     transition: all 0.3s;
   }
-  .tab.active {
-    border-color: #f7931a;
-    color: #f7931a;
-    background: #0d0d2b;
-  }
+  .tab.active { border-color: #f7931a; color: #f7931a; background: #0d0d2b; }
   .tab-content { display: none; }
   .tab-content.active { display: block; }
   .copy-btn {
@@ -177,20 +169,19 @@
   }
   .server-status {
     text-align: center;
-    padding: 6px;
-    font-size: 11px;
-    margin-bottom: 10px;
-    border-radius: 6px;
+    padding: 8px;
+    font-size: 12px;
+    margin-bottom: 15px;
+    border-radius: 8px;
   }
-  .server-online { background: #0d2b1a; color: #00ff88; }
-  .server-offline { background: #2b0d0d; color: #ff4444; }
+  .server-online { background: #0d2b1a; color: #00ff88; border: 1px solid #00ff88; }
+  .server-offline { background: #2b0d0d; color: #ff4444; border: 1px solid #ff4444; }
   @keyframes pulse {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.3; }
   }
   .hidden { display: none; }
   #walletSection { display: none; }
-  .loading { opacity: 0.6; pointer-events: none; }
 </style>
 </head>
 <body>
@@ -202,7 +193,9 @@
 
 <div class="container">
 
-  <div id="serverStatus" class="server-status">Connecting to StableI Server...</div>
+  <div id="serverStatus" class="server-status">
+    🔄 Connecting to StableI Server...
+  </div>
 
   <!-- Setup Section -->
   <div id="setupSection">
@@ -309,7 +302,7 @@
     <!-- Receive -->
     <div class="card">
       <h2>📥 RECEIVE COINS</h2>
-      <p style="color:#aaa; font-size:13px">Share your address:</p>
+      <p style="color:#aaa; font-size:13px">Share your address to receive coins:</p>
       <div class="address-box" id="receiveAddress">-</div>
       <button class="btn btn-outline" onclick="copyAddress()" style="margin-top:10px">
         📋 Copy Address
@@ -350,24 +343,26 @@
 
 <script>
 // ============================================
-// STABLEI WALLET - Connected to Real Server
+// STABLEI WALLET - Live Server Connected
+// Server: https://stablei-chain.onrender.com
+// Founded by: Abhi | GitHub: stablei
 // ============================================
 
-const API = 'http://localhost:3000';
+const API = 'https://stablei-chain.onrender.com';
 let currentWallet = null;
 
-// Check server status
+// Check server
 async function checkServer() {
   try {
     const res = await fetch(API + '/api/status');
     const data = await res.json();
     const el = document.getElementById('serverStatus');
     el.className = 'server-status server-online';
-    el.textContent = '🟢 StableI Server Online | Blocks: ' + data.blocks + ' | Wallets: ' + data.wallets;
+    el.textContent = '🟢 StableI Server Live | Blocks: ' + data.blocks + ' | Wallets: ' + data.wallets + ' | 24/7 Online';
   } catch (e) {
     const el = document.getElementById('serverStatus');
     el.className = 'server-status server-offline';
-    el.textContent = '🔴 Server Offline - Start server.js first!';
+    el.textContent = '🔴 Server Starting... Please wait 30 seconds and refresh!';
   }
 }
 
@@ -391,7 +386,6 @@ async function createWallet() {
     showAlert('setupAlert', '❌ Please enter your name!', 'error');
     return;
   }
-
   try {
     const res = await fetch(API + '/api/wallet/create', {
       method: 'POST',
@@ -399,24 +393,20 @@ async function createWallet() {
       body: JSON.stringify({ name })
     });
     const data = await res.json();
-
     if (data.error) {
       showAlert('setupAlert', '❌ ' + data.error, 'error');
       return;
     }
-
     currentWallet = {
       name,
       address: data.address,
       privateKey: data.privateKey,
       balance: data.balance
     };
-
     saveLocal();
     showWalletDashboard();
-
   } catch (e) {
-    showAlert('setupAlert', '❌ Server offline! Start node server.js first', 'error');
+    showAlert('setupAlert', '🔴 Server starting up! Wait 30 seconds and try again.', 'error');
   }
 }
 
@@ -424,23 +414,19 @@ async function createWallet() {
 async function importWallet() {
   const name = document.getElementById('importName').value.trim();
   const privateKey = document.getElementById('importKey').value.trim();
-
   if (!name || !privateKey) {
     showAlert('setupAlert', '❌ Enter name and private key!', 'error');
     return;
   }
-
   currentWallet = {
     name,
     privateKey,
     address: localStorage.getItem('si_address_' + privateKey) || '',
     balance: { SI: 0, SIR: 0, SID: 0 }
   };
-
   if (currentWallet.address) {
     await refreshBalance();
   }
-
   saveLocal();
   showWalletDashboard();
 }
@@ -464,7 +450,7 @@ function updateDisplay() {
   document.getElementById('sidBalance').textContent = currentWallet.balance.SID + ' SID ($' + currentWallet.balance.SID + ')';
 }
 
-// Refresh balance from server
+// Refresh balance
 async function refreshBalance() {
   if (!currentWallet || !currentWallet.address) return;
   try {
@@ -476,7 +462,7 @@ async function refreshBalance() {
       saveLocal();
     }
   } catch (e) {
-    console.log('Server offline');
+    console.log('Cannot refresh');
   }
 }
 
@@ -485,11 +471,9 @@ async function sendCoins() {
   const to = document.getElementById('sendTo').value.trim();
   const coin = document.getElementById('sendCoin').value;
   const amount = parseFloat(document.getElementById('sendAmount').value);
-
   if (!to) { showAlert('sendAlert', '❌ Enter recipient address!', 'error'); return; }
   if (!amount || amount <= 0) { showAlert('sendAlert', '❌ Enter valid amount!', 'error'); return; }
   if (to === currentWallet.address) { showAlert('sendAlert', '❌ Cannot send to yourself!', 'error'); return; }
-
   try {
     const res = await fetch(API + '/api/transaction/send', {
       method: 'POST',
@@ -502,24 +486,18 @@ async function sendCoins() {
         amount
       })
     });
-
     const data = await res.json();
-
     if (data.error) {
       showAlert('sendAlert', '❌ ' + data.error, 'error');
       return;
     }
-
     document.getElementById('sendTo').value = '';
     document.getElementById('sendAmount').value = '';
-
     await refreshBalance();
     await loadTransactions();
-
     showAlert('sendAlert', `✅ Sent ${amount} ${coin}! TxID: ${data.txId}`, 'success');
-
   } catch (e) {
-    showAlert('sendAlert', '❌ Server offline!', 'error');
+    showAlert('sendAlert', '❌ Server error! Try again.', 'error');
   }
 }
 
@@ -531,23 +509,18 @@ async function getTestCoins() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ address: currentWallet.address })
     });
-
     const data = await res.json();
-
     if (data.error) {
       showAlert('faucetAlert', '⚠️ ' + data.error, 'warning');
       return;
     }
-
     currentWallet.balance = data.balance;
     updateDisplay();
     saveLocal();
     await loadTransactions();
-
     showAlert('faucetAlert', '🎉 Received 1000 SI + 100 SIR + 10 SID!', 'success');
-
   } catch (e) {
-    showAlert('faucetAlert', '❌ Server offline!', 'error');
+    showAlert('faucetAlert', '❌ Server error! Try again.', 'error');
   }
 }
 
@@ -557,13 +530,11 @@ async function loadTransactions() {
   try {
     const res = await fetch(API + '/api/transactions/' + currentWallet.address);
     const txs = await res.json();
-
     const list = document.getElementById('txList');
     if (txs.length === 0) {
       list.innerHTML = '<p style="color:#555; font-size:13px; text-align:center; padding:20px">No transactions yet</p>';
       return;
     }
-
     list.innerHTML = txs.map(tx => `
       <div class="tx-item ${tx.from === currentWallet.address ? 'tx-sent' : 'tx-received'}">
         <span class="tx-type">${tx.from === currentWallet.address ? '📤 SENT' : '📥 RECEIVED'}</span>
@@ -577,7 +548,6 @@ async function loadTransactions() {
         <div class="tx-time">${tx.timestamp} • TxID: ${tx.txId}</div>
       </div>
     `).join('');
-
   } catch (e) {
     console.log('Cannot load transactions');
   }
@@ -585,8 +555,7 @@ async function loadTransactions() {
 
 // Show/hide private key
 function showPrivateKey() {
-  const box = document.getElementById('privateKeyBox');
-  box.classList.toggle('hidden');
+  document.getElementById('privateKeyBox').classList.toggle('hidden');
 }
 
 // Copy address
@@ -599,7 +568,7 @@ function copyAddress() {
 function shareAddress() {
   if (navigator.share) {
     navigator.share({
-      title: 'My StableI Wallet Address',
+      title: 'My StableI Wallet',
       text: 'Send me SI coins! My StableI address: ' + currentWallet.address
     });
   } else {
@@ -607,7 +576,7 @@ function shareAddress() {
   }
 }
 
-// Save to local storage
+// Save local
 function saveLocal() {
   if (currentWallet) {
     localStorage.setItem('si_wallet', JSON.stringify(currentWallet));
@@ -634,11 +603,10 @@ function logout() {
   document.getElementById('setupSection').style.display = 'block';
 }
 
-// Auto load saved wallet
+// Auto load
 window.onload = async function() {
   checkServer();
-  setInterval(checkServer, 10000);
-
+  setInterval(checkServer, 15000);
   const saved = localStorage.getItem('si_wallet');
   if (saved) {
     currentWallet = JSON.parse(saved);
