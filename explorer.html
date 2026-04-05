@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StableI Chain Explorer</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a0a1a;
+    color: #fff;
+    font-family: 'Segoe UI', sans-serif;
+  }
+  header {
+    background: linear-gradient(135deg, #1a1a3e, #0d0d2b);
+    padding: 20px;
+    text-align: center;
+    border-bottom: 2px solid #f7931a;
+  }
+  header h1 {
+    font-size: 28px;
+    color: #f7931a;
+    letter-spacing: 3px;
+  }
+  header p { color: #aaa; margin-top: 5px; }
+  .stats {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding: 20px;
+    flex-wrap: wrap;
+  }
+  .stat-card {
+    background: #1a1a3e;
+    border: 1px solid #f7931a;
+    border-radius: 10px;
+    padding: 15px 25px;
+    text-align: center;
+    min-width: 150px;
+  }
+  .stat-card h3 { color: #f7931a; font-size: 24px; }
+  .stat-card p { color: #aaa; font-size: 12px; margin-top: 5px; }
+  .section-title {
+    text-align: center;
+    color: #f7931a;
+    font-size: 20px;
+    margin: 20px 0 10px;
+    letter-spacing: 2px;
+  }
+  .blocks {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 10px 20px;
+  }
+  .block-card {
+    background: #1a1a3e;
+    border: 1px solid #333;
+    border-left: 4px solid #f7931a;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    transition: all 0.3s;
+  }
+  .block-card:hover {
+    border-left-color: #00ff88;
+    transform: translateX(5px);
+  }
+  .block-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .block-num {
+    background: #f7931a;
+    color: #000;
+    padding: 3px 12px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 14px;
+  }
+  .block-time { color: #888; font-size: 12px; }
+  .block-hash {
+    color: #00ff88;
+    font-size: 11px;
+    font-family: monospace;
+    word-break: break-all;
+    margin-bottom: 8px;
+  }
+  .tx-item {
+    background: #0d0d2b;
+    border-radius: 6px;
+    padding: 8px 12px;
+    margin-top: 8px;
+    font-size: 12px;
+  }
+  .tx-type {
+    color: #f7931a;
+    font-weight: bold;
+    font-size: 11px;
+  }
+  .tx-amount { color: #00ff88; font-weight: bold; }
+  .coins {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    padding: 10px 20px;
+    flex-wrap: wrap;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .coin-card {
+    background: #1a1a3e;
+    border: 1px solid #333;
+    border-radius: 10px;
+    padding: 15px 20px;
+    text-align: center;
+    min-width: 180px;
+    flex: 1;
+  }
+  .coin-name { font-size: 22px; font-weight: bold; color: #f7931a; }
+  .coin-desc { color: #aaa; font-size: 11px; margin-top: 4px; }
+  .coin-price { color: #00ff88; font-size: 16px; margin-top: 8px; }
+  footer {
+    text-align: center;
+    padding: 20px;
+    color: #555;
+    font-size: 12px;
+    margin-top: 30px;
+    border-top: 1px solid #222;
+  }
+  .live-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: #00ff88;
+    border-radius: 50%;
+    margin-right: 6px;
+    animation: pulse 1.5s infinite;
+  }
+  @keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.3; }
+    100% { opacity: 1; }
+  }
+  .tag {
+    display: inline-block;
+    background: #0d2b1a;
+    color: #00ff88;
+    border: 1px solid #00ff88;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 10px;
+    margin-left: 8px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>⛓️ STABLEI CHAIN EXPLORER</h1>
+  <p><span class="live-dot"></span>Live • Quantum Safe SHA3-256 • India's Blockchain 🇮🇳</p>
+</header>
+
+<!-- Stats -->
+<div class="stats">
+  <div class="stat-card">
+    <h3>3</h3>
+    <p>TOTAL BLOCKS</p>
+  </div>
+  <div class="stat-card">
+    <h3>4</h3>
+    <p>TRANSACTIONS</p>
+  </div>
+  <div class="stat-card">
+    <h3>SHA3-256</h3>
+    <p>ENCRYPTION</p>
+  </div>
+  <div class="stat-card">
+    <h3>0.1%</h3>
+    <p>TX FEE</p>
+  </div>
+  <div class="stat-card">
+    <h3>1B</h3>
+    <p>TOTAL SUPPLY</p>
+  </div>
+</div>
+
+<!-- Coins -->
+<h2 class="section-title">⚡ STABLEI COINS</h2>
+<div class="coins">
+  <div class="coin-card">
+    <div class="coin-name">SI</div>
+    <div class="coin-desc">StableI Main Coin</div>
+    <div class="coin-price">🚀 Growing</div>
+  </div>
+  <div class="coin-card">
+    <div class="coin-name">SIR</div>
+    <div class="coin-desc">StableI Rupee</div>
+    <div class="coin-price">₹1.00 Always</div>
+  </div>
+  <div class="coin-card">
+    <div class="coin-name">SID</div>
+    <div class="coin-desc">StableI Dollar</div>
+    <div class="coin-price">$1.00 Always</div>
+  </div>
+</div>
+
+<!-- Blocks -->
+<h2 class="section-title">🔗 LATEST BLOCKS</h2>
+<div class="blocks">
+
+  <div class="block-card">
+    <div class="block-header">
+      <span class="block-num">Block #0 — Genesis</span>
+      <span class="block-time">2026-04-02 • StableI Born</span>
+    </div>
+    <div class="block-hash">
+      Hash: 2feb121e30ec7ae32284c146234c565f...
+    </div>
+    <div class="tx-item">
+      <div class="tx-type">🌍 GENESIS BLOCK</div>
+      <div>Founder: Abhi | GitHub: stablei</div>
+      <div>Vision: "Your Money. Stable. Always."</div>
+      <div>Security: <span class="tag">SHA3-256 Quantum Safe</span></div>
+    </div>
+  </div>
+
+  <div class="block-card">
+    <div class="block-header">
+      <span class="block-num">Block #1</span>
+      <span class="block-time">2026-04-02 • First Transactions</span>
+    </div>
+    <div class="block-hash">
+      Hash: 00f41a9f87b9ef93793474d6b16778f2...
+    </div>
+    <div class="tx-item">
+      <div class="tx-type">💸 GENESIS_TRANSFER</div>
+      <div>From: Abhi → To: World</div>
+      <div>Amount: <span class="tx-amount">1,000,000 SI</span></div>
+    </div>
+    <div class="tx-item">
+      <div class="tx-type">🏦 MINT_SIR</div>
+      <div>First Indian Rupee Stablecoin Ever!</div>
+      <div>Amount: <span class="tx-amount">1,000 SIR = ₹1,000</span></div>
+    </div>
+    <div class="tx-item">
+      <div class="tx-type">💵 MINT_SID</div>
+      <div>StableI Dollar Launched!</div>
+      <div>Amount: <span class="tx-amount">1,000 SID = $1,000</span></div>
+    </div>
+  </div>
+
+  <div class="block-card">
+    <div class="block-header">
+      <span class="block-num">Block #2</span>
+      <span class="block-time">2026-04-02 • Mining Reward</span>
+    </div>
+    <div class="block-hash">
+      Hash: 00866ff8b8defe57ba950cb43792862f...
+    </div>
+    <div class="tx-item">
+      <div class="tx-type">⛏️ MINING_REWARD</div>
+      <div>From: StableI Network → To: Abhi</div>
+      <div>Amount: <span class="tx-amount">50 SI</span></div>
+    </div>
+    <div class="tx-item">
+      <div class="tx-type">✅ TRANSFER</div>
+      <div>First SI Transfer on StableI Chain!</div>
+      <div>Amount: <span class="tx-amount">100 SI</span> • Fee: 0.1 SI</div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <p>⛓️ StableI Chain • Founded by Abhi 🇮🇳 • Quantum Safe SHA3-256</p>
+  <p style="margin-top:8px">github.com/stablei/stablei-chain</p>
+  <p style="margin-top:8px; color:#f7931a">"Your Money. Stable. Always."</p>
+</footer>
+
+</body>
+</html>
